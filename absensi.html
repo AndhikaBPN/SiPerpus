@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Absensi Karyawan</title>
+
+<!-- swiper css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+    <!-- box icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="css/absensi.css" />
+
+</head>
+<body>
+<!-- Header Design -->
+    <header class="header">
+      <a href="#" class="logo">Project Candi Pt.2</a>
+
+      <nav class="navbar">
+        <a href="#">BERANDA</a>
+        <a href="karyawan.html">KARYAWAN</a>
+        <a href="absensi.html">ABSENSI</a>
+        <a href="cuti.html">CUTI</a>
+        <a href="#">LAPORAN</a>
+        <a href="#" class="logout"><i class='bx bx-log-out'></i></a>
+      </nav>
+
+      <div class="bx bx-menu" id="menu-icon"></div>
+    </header>
+
+    <section class="home-info" id="info">
+  <div class="container">
+    <!-- FORM KARYAWAN -->
+    <div class="card form-karyawan">
+    <h3>Informasi Karyawan</h3>
+    <div class="form-group">
+        <label>Nama</label>
+        <input type="text" value="Angela Nazareta" readonly>
+    </div>
+    <div class="form-group">
+        <label>NIP</label>
+        <input type="text" value="12345678" readonly>
+    </div>
+    <div class="form-group">
+        <label>Divisi</label>
+        <input type="text" value="FrontEnd Dev" readonly>
+    </div>
+    <div class="form-group">
+        <label>Jabatan </label>
+        <input type="text" value="Kepala Divisi" readonly>
+    </div>
+    </div>
+
+    <!-- LIVE ATTENDANCE -->
+    <div class="card absensi-box">
+      <h3>Live Attendance</h3>
+      <div class="time-now" id="currentTime">--:--</div>
+      <div class="date-now" id="currentDate">--</div>
+
+      <div class="input-time">
+        <input type="text" id="clockInTime" placeholder="--:--" readonly>
+        <input type="text" id="clockOutTime" placeholder="--:--" readonly>
+      </div>
+
+      <div class="buttons">
+        <button class="clock-in" onclick="clockIn()">Clock In</button>
+        <button class="clock-out" onclick="clockOut()">Clock Out</button>
+      </div>
+
+      <div class="duration" id="durationText">Lama bekerja: -</div>
+    </div>
+  </div>
+
+  <!-- REKAP -->
+  <div class="rekap-section card">
+    <h3>Rekap Absensi</h3>
+    <div class="rekap-filter">
+      <input type="date" id="startDate">
+      <input type="date" id="endDate">
+      <button onclick="tampilkanRekap()">Tampilkan</button>
+    </div>
+
+    <table id="rekapTable">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Masuk</th>
+          <th>Pulang</th>
+          <th>Lama Kerja</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- data muncul via JS -->
+      </tbody>
+    </table>
+  </div>
+  </section>
+
+  <script>
+    // LIVE CLOCK
+    function updateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const date = now.toLocaleDateString('id-ID', {
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+      });
+
+      document.getElementById("currentTime").textContent = time;
+      document.getElementById("currentDate").textContent = date;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // ABSENSI
+    let clockIn = null;
+    let clockOut = null;
+
+    function clockIn() {
+      const now = new Date();
+      clockIn = now;
+      document.getElementById("clockInTime").value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById("durationText").textContent = "Lama bekerja: -";
+    }
+
+    function clockOut() {
+      if (!clockIn) {
+        alert("Harap Clock In dulu!");
+        return;
+      }
+
+      const now = new Date();
+      clockOut = now;
+      document.getElementById("clockOutTime").value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+      const durationMs = clockOut - clockIn;
+      const hours = Math.floor(durationMs / (1000 * 60 * 60));
+      const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+      document.getElementById("durationText").textContent = `Lama bekerja: ${hours} jam ${minutes} menit`;
+    }
+
+    // REKAP ABSENSI DUMMY
+    const dataDummy = [
+      { tanggal: '2025-06-24', masuk: '08:52', pulang: '17:00', durasi: '8j 8m', status: 'Hadir' },
+      { tanggal: '2025-06-23', masuk: '09:10', pulang: '17:00', durasi: '7j 50m', status: 'Telat' },
+      { tanggal: '2025-06-22', masuk: '08:58', pulang: '16:45', durasi: '7j 47m', status: 'Hadir' },
+    ];
+
+    function tampilkanRekap() {
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
+      const tbody = document.querySelector("#rekapTable tbody");
+      tbody.innerHTML = '';
+
+      if (!start || !end) {
+        alert("Pilih range tanggal dulu");
+        return;
+      }
+
+      const hasilFilter = dataDummy.filter(item => item.tanggal >= start && item.tanggal <= end);
+
+      if (hasilFilter.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Tidak ada data</td></tr>';
+        return;
+      }
+
+      hasilFilter.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.tanggal}</td>
+          <td>${row.masuk}</td>
+          <td>${row.pulang}</td>
+          <td>${row.durasi}</td>
+          <td>${row.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
