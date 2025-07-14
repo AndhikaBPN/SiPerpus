@@ -1,5 +1,5 @@
 <?php
-inlcue '../koneksi.php';
+include '../koneksi.php';
 
 $hasil=$_POST['cari'];
 if ($hasil==1 or $hasil==3 or $hasil==7) {
