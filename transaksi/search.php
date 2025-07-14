@@ -19,6 +19,7 @@ if ($hasil==1 or $hasil==3 or $hasil==7) {
     while ($data = mysqli_fetch_assoc($res)) {
         $pinjam[] = $data;
     }
+}
 ?>
 
     <table class="">
@@ -62,4 +63,3 @@ if ($hasil==1 or $hasil==3 or $hasil==7) {
         }
         ?>
     </table>
-?>
